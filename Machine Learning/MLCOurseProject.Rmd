@@ -1,0 +1,50 @@
+---
+title: "Machine Learning Course Project"
+author: "Vera"
+date: "21 February 2015"
+output: html_document
+---
+
+###Description
+The goal of this project is to predict the method in which the participants did an exercise, either correctly (A), or one of four incorrect ways (B,C,D,E). There is data on which to train the prediction algorithm in the file "pml-training.csv" and the algorithm will eventually be tested on the data is in the file "pml-testing.csv". The data was first preprocessed by removing columns that were mostly consisted of NA. Columns 1-7 were also removed for potential bias. For example, the first column is the order of data entry and has a near-perfect correspondence to the order of the type of exercise performed (see figure 1). Certain rows of the data were interpreted as summaries of the other data in the file. These were removed by excluding rows where the variable "new_window" had "yes" as its value.
+
+The method used to create a prediction model was randomForest. The function randomForest() was run on the preprocessed data setting the maximum number of trees to 100 and leaving other options set to the defaults. The function randomForest() has an internal method of cross-validation expressed as out-of-bag error, so all of the training data was included and no additional cross-validation was performed. The estimate of out-of sample error, using the final out-of-bag error estimate, since the error rates are already calculated over all prior trees. The resulting error estimate is 0.0036. 
+
+###Code
+
+```{r}
+# Load the data
+library(randomForest)
+A<-read.csv("pml-training.csv", na.strings = c("NA",""," "))
+
+# preprocess- remove columns with NA or counterproductive effect
+DropColumn=logical(length=length(A))
+for (idx in 1:length(A)) {
+    if (sum(is.na(A[,idx]))/dim(A)[1] >0.5) {
+        DropColumn[idx] <- TRUE
+    }
+    if (idx <= 7) DropColumn[idx] <- TRUE
+}
+
+B <- subset(A, subset=A$new_window == "no", select=!DropColumn)
+
+# Do random forest on B
+set.seed(1)
+ForestObject <- randomForest(classe ~ ., data=B, ntree=100)
+```
+```{r}
+# FinalOut of bag error
+print(ForestObject$err.rate[100,1])
+```
+
+### Figure
+```{r, echo=FALSE}
+plot(A$X,A$classe, main="Figure 1")
+```
+
+### Testing
+```{r}
+T<-read.csv("pml-testing.csv", na.strings = c("NA",""," "))
+predictions<-predict(ForestObject,T)
+print(predictions)
+```

@@ -1,0 +1,40 @@
+caret package: library(caret)
+confusionMatrix() is a useful function for doing truth tables
+
+when indexing -indexset for binary indexset will give the opposite.
+
+split data using createDataPartition (into training and test set)
+make K-folds using createFolds (for cross-validation). createFolds remembers the partitioning from createDataPartition.
+for bootstrapping aka resampling, use createResample function. createResample does folds then resamples within them
+
+createTimeSlices to get windows of time to use
+featurePlot to plot several variables against each other at once
+
+ggplot2 package is useful for exploratory data analysis.
+
+cut2 in the Hmisc package is useful for breaking up data into groups 
+
+Note: do exploratory analysis on training set only.
+
+more useful functions:
+table()
+prop.table()
+
+When you do a transformation on a training set, you do the same transformation on the test set, using the values from the training set. (All parameters are constants, not variables when applying to the test set)
+
+preProcess function of caret package does some preprocessing. 
+
+if you pass preObj (the output of preProcess) to the predict function, it will automatically do the correct processing on the test set.
+
+alternately, you can pass preProcess argument to the train function
+
+If there are NAs you can "impute" them  by running preProcess using the "knnImpute" method. (k nearest neighbors impute) then running predict on the training set using the output of preProcess.
+
+dummyVars() to transform factor variables to (multiple) indicator variables. Indicator variables are 1 if that factor value is true, and 0 otherwise.
+
+nearZeroVar() identifies covariates that have very little variation and so will not be good predictors.
+
+bs() function from the splines library creates polynomials
+use the predict() function to apply the output of bs() on the training set to the test set.
+
+prcomp() does principal component analysis (which is the same as singular value decomposition) Often have to add one and take a log to make input gaussian-looking which is important for PCA. Using the caret package, run preProcess(...,method="pca",...) to do PCA
